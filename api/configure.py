@@ -438,7 +438,7 @@ CONFIGURE_HTML = """<!DOCTYPE html>
         function buildManifestUrl(token) {
             if (!token) return '';
             const origin = window.location.origin.replace(/\/$/, '');
-            return `${origin}/manifest/${token}.json`;
+            return `${origin}/manifest.json?token=${encodeURIComponent(token)}`;
         }
 
         function buildCatalogLinks(languages, token) {
@@ -556,7 +556,8 @@ class handler(BaseHTTPRequestHandler):
             protocol = self.headers.get('x-forwarded-proto', 'https')
             host = self.headers.get('host', '')
             base_url = f"{protocol}://{host}" if host else ''
-            manifest_path = f"/manifest/{token}.json"
+            token_query = f"?token={quote(token)}" if token else ""
+            manifest_path = f"/manifest.json{token_query}"
             manifest_url = f"{base_url}{manifest_path}" if base_url else manifest_path
 
             stremio_app_link = f"stremio://add-addon?uri={quote(manifest_url)}"
