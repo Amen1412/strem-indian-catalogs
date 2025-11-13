@@ -1,0 +1,47 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/**/*.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/manifest/(?<token>[^/]+)\\.json",
+      "dest": "/api/manifest.py?token=$token"
+    },
+    {
+      "src": "/manifest.json",
+      "dest": "/api/manifest.py"
+    },
+    {
+      "src": "/catalog/movie/(?<catalog_id>[^/]+)\\.json",
+      "dest": "/api/catalog.py?id=$catalog_id"
+    },
+    {
+      "src": "/refresh",
+      "dest": "/api/refresh.py"
+    },
+    {
+      "src": "/configure",
+      "dest": "/api/configure.py"
+    },
+    {
+      "src": "/api/configure",
+      "dest": "/api/configure.py"
+    },
+    {
+      "src": "/api/cron/refresh",
+      "dest": "/api/cron_refresh.py"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/refresh",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}
+
+
