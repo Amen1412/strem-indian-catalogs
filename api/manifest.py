@@ -15,12 +15,23 @@ try:
 except ImportError:
     # Add parent directory to path
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    from api.utils import (
-        get_enabled_languages,
-        LANGUAGE_NAMES,
-        build_catalog_id,
-        load_config,
-    )
+    try:
+        from api.utils import (
+            get_enabled_languages,
+            LANGUAGE_NAMES,
+            build_catalog_id,
+            load_config,
+        )
+    except ImportError as e:
+        print(f"[ERROR] Failed to import utils: {e}")
+        # Fallback defaults
+        LANGUAGE_NAMES = {"malayalam": "Malayalam", "hindi": "Hindi", "tamil": "Tamil", "kannada": "Kannada"}
+        def get_enabled_languages(token=None):
+            return ["malayalam"]
+        def build_catalog_id(lang, token):
+            return f"{lang}~{token}" if token else lang
+        def load_config(token):
+            return {"enabled_languages": ["malayalam"]}
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
