@@ -25,12 +25,9 @@ except ImportError:
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         try:
-            # Get the full path including query string
-            full_path = self.path
-            if '?' not in full_path and self.headers.get('X-Vercel-Forwarded-Query'):
-                full_path = f"{full_path}?{self.headers.get('X-Vercel-Forwarded-Query')}"
-            
-            parsed_url = urlparse(full_path)
+            # Parse the path and query string
+            # self.path includes query string in Vercel Python handlers
+            parsed_url = urlparse(self.path)
             query_params = parse_qs(parsed_url.query)
             token = query_params.get("token", [None])[0]
 
@@ -41,8 +38,12 @@ class handler(BaseHTTPRequestHandler):
                     token = maybe_token
 
             # When no token is provided (direct /manifest.json), fall back to default config.
-            config = load_config(token)
-            enabled_languages = config.get("enabled_languages", ["malayalam"])
+            try:
+                config = load_config(token)
+                enabled_languages = config.get("enabled_languages", ["malayalam"])
+            except Exception as e:
+                print(f"[WARNING] Error loading config: {e}")
+                enabled_languages = ["malayalam"]
             
             # Ensure we have at least one language
             if not enabled_languages or not isinstance(enabled_languages, list):
